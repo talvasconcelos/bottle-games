@@ -1,5 +1,131 @@
-.profile {
+.blackjack {
 	padding: 56px 20px;
 	min-height: 100%;
 	width: 100%;
 }
+
+.game-area{
+	display: grid;
+	height: 75vh;
+	grid-template-rows: 1fr 1fr;
+	background: pink;
+}
+
+.hand {
+	position: relative;
+	display: flex;
+	flex-wrap: nowrap;
+	padding: 5px;
+	justify-content: center;
+}
+
+img.card {
+	width: 50%;
+	margin: 5px;
+	padding: 0;
+	border: 0;
+	vertical-align: initial;
+	box-sizing: initial;
+}
+
+/* cards 
+
+img.card {
+	width: 70px;
+	border: 0;
+	vertical-align: initial;
+	box-sizing: initial
+}
+
+.hand,
+img.card {
+	margin: 0;
+	padding: 0
+}
+
+.active-hand img.card {
+	cursor: pointer
+}
+
+.hhand {
+	display: inline-block
+}
+
+.hhand img.card {
+	padding-top: 10px
+}
+
+.hhand.active-hand img.card:hover {
+	padding-top: 0;
+	padding-bottom: 10px
+}
+
+.vhand {
+	display: block
+}
+
+.vhand img.card {
+	padding-right: 10px
+}
+
+.vhand.active-hand img.card:hover {
+	padding-right: 0;
+	padding-left: 10px
+}
+
+.hhand-compact {
+	display: inline-block
+}
+
+.hhand-compact img.card:first-child {
+	margin-left: 0;
+	padding-top: 10px
+}
+
+.hhand-compact img.card {
+	margin-left: -52px;
+	padding-top: 10px
+}
+
+.hhand-compact.active-hand img.card:hover {
+	padding-top: 0;
+	padding-bottom: 10px
+}
+
+.vhand-compact {
+	display: inline-block;
+	vertical-align: top
+}
+
+.vhand-compact img.card:first-child {
+	display: block;
+	margin-top: 0;
+	padding-right: 10px
+}
+
+.vhand-compact img.card {
+	display: block;
+	margin-top: -80px;
+	padding-right: 10px
+}
+
+.active-hand .vhand-compact img.card:hover,
+.vhand-compact.active-hand img.card:hover {
+	display: block;
+	padding-right: 0;
+	padding-left: 10px
+}
+
+.fan {
+	display: inline-block;
+	vertical-align: top;
+	position: relative;
+	padding-bottom: 1em
+}
+
+.fan img.card {
+	position: absolute;
+	width: 90px
+}
+
+*/

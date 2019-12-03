@@ -1,7 +1,8 @@
 import { h, Component } from 'preact'
-import style from './style'
 
 import * as B from '../../lib/blackjack'
+
+import Gamehand from '../../components/blackjack/gamehand'
 
 const { BUST, WIN, LOSE, PUSH, BLACKJACK } = B.results
 
@@ -87,8 +88,27 @@ export default class Blackjack extends Component {
         return bet
     }
 
-    handleAction = () => {
-        this.hit()
+    handleAction = (e) => {
+        e.preventDefault()
+        e.preventDefault()
+        const action = e.target.innerText.toLowerCase()
+        console.log(action)
+        switch (action) {
+            case 'hit':
+                this.hit()
+                break;
+            case 'stand':
+                this.stand()
+                break;
+            case 'split':
+                this.split()
+                break;
+            case 'double down':
+                this.doubleDown()
+                break;        
+            default:
+                break;
+        }
     }
 
     hit = async (onlyOnce = false, isDealer = false) => {
@@ -99,20 +119,51 @@ export default class Blackjack extends Component {
         // !isDealer && console.debug('hit result', isResult, isDealer)
         if(isResult || onlyOnce) {
             !isDealer && console.log('#1', isResult, onlyOnce)
-            return this.endTurn()
+            return setTimeout(() => this.endTurn(), 500)
         }
         if(B.score(this.state.hands[active].cards) === 21) {
             !isDealer && console.log('#2')
-            return this.endTurn()
+            return setTimeout(() => this.endTurn(), 500)
         }
         if(isDealer) {
             console.log('#3')
-            return this.makeDealerDecision()
+            return setTimeout(() => this.makeDealerDecision(), 500)
         }
     }
 
     stand = () => {
         this.endTurn()
+    }
+
+    /*
+    canSplit (state) {
+    if (state.bank < state.settings.minimumBet) return false
+    if (!state.hands.length || !state.activeHandIndex) return false
+    if (state.hands.length > 2) return false
+    const cards = state.hands[state.activeHandIndex].cards
+    return cards.length === 2 && cards[0].value === cards[1].value
+    },
+    canDoubleDown (state) {
+        if (state.bank < state.settings.minimumBet) return false
+        if (!state.hands.length || !state.activeHandIndex) return false
+        const cards = state.hands[state.activeHandIndex].cards
+        return cards.length === 2
+    },
+    */
+
+    split = () => {
+        const hands = this.state.hands
+        hands[2] = clone(BASE_HAND)
+        hands[2].cards.push(hands[1].cards.pop())
+        hands[2].bets[0] = this.bet()
+        this.setState({hands, activeHandIndex: null}, this.startNextTurn)
+    }
+
+    doubleDown = () => {
+        const idx = this.state.activeHandIndex
+        const hands = this.state.hands
+        hands[idx].bets = [...hands[idx].bets, this.bet()]
+        this.setState({hands}, () => this.hit(true))
     }
 
     deal = async (deal) => {
@@ -271,18 +322,23 @@ export default class Blackjack extends Component {
     }
 
 
-    render = ({}, {hands, shoe}) => {
-        return (        
-            <div class={style.profile}>
-                <h1>Profile: </h1>
-                <p>This is the user profile for a user named.</p>
-                {hands && JSON.stringify(hands[1].cards)}
-                <div>Current time: </div>
-                <div>
-                    <button onClick={this.hit}>hit</button>
-                    <button onClick={this.stand}>stand</button>
+    render = ({}, {hands, bank}) => {
+        return hands && (    
+            <div class='blackjack'>
+                <h1>Blackjack</h1>
+                <div class='game-area'>
+                    <Gamehand hand={hands[0]} />
+                    <p>{bank}</p>
+                    <Gamehand hand={hands[1]} />
+                    {hands[2] && <Gamehand hand={hands[2]} />}
                 </div>
-            </div>        
+                <div>
+                    <button onClick={this.handleAction}>Double Down</button>
+                    <button onClick={this.handleAction}>Split</button>
+                    <button onClick={this.handleAction}>Hit</button>
+                    <button onClick={this.handleAction}>Stand</button>
+                </div>
+            </div>  
         )
     }
 }
