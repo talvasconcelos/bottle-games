@@ -6,6 +6,8 @@ import Gamehand from '../../components/blackjack/gamehand'
 
 const { BUST, WIN, LOSE, PUSH, BLACKJACK } = B.results
 
+const DELAY = 750
+
 const BASE_HAND = {
   cards: [],
   result: undefined,
@@ -25,6 +27,7 @@ export default class Blackjack extends Component {
             minimumBet: this.props.bet
         },
         bank: 0,
+        pot: 0,
         shoe: null,
         hands: null,
         activeHandIndex: null,
@@ -83,7 +86,7 @@ export default class Blackjack extends Component {
         const c = this.state.settings
         if(this.state.bank < c.minimumBet) return
         const bet = c.minimumBet
-        this.setState({bank: this.state.bank - bet})
+        this.setState({bank: this.state.bank - bet, pot: this.state.pot + bet})
         console.log(bet)
         return bet
     }
@@ -119,15 +122,15 @@ export default class Blackjack extends Component {
         // !isDealer && console.debug('hit result', isResult, isDealer)
         if(isResult || onlyOnce) {
             !isDealer && console.log('#1', isResult, onlyOnce)
-            return setTimeout(() => this.endTurn(), 500)
+            return setTimeout(() => this.endTurn(), DELAY)
         }
         if(B.score(this.state.hands[active].cards) === 21) {
             !isDealer && console.log('#2')
-            return setTimeout(() => this.endTurn(), 500)
+            return setTimeout(() => this.endTurn(), DELAY)
         }
         if(isDealer) {
             console.log('#3')
-            return setTimeout(() => this.makeDealerDecision(), 500)
+            return setTimeout(() => this.makeDealerDecision(), DELAY)
         }
     }
 
@@ -228,9 +231,9 @@ export default class Blackjack extends Component {
         await this.checkForBustsAndBlackjacks()
         if(this.state.hands.find(hand => hand.result)){
             await this.revealDealerHand()
-            this.endRound()
+            setTimeout(() => this.endRound(), DELAY)
         } else {
-            this.startNextTurn()
+            setTimeout(() => this.startNextTurn(), DELAY)
         }
     }
 
@@ -276,15 +279,15 @@ export default class Blackjack extends Component {
             // await this.setStateSync({bank: this.state.bank + winnings})
             hand.bets = []
         }
-        this.setState({hands, bank, activeHandIndex: null}, this.resetRound)
+        setTimeout(() => this.setState({hands, bank, activeHandIndex: null, pot: 0}, this.resetRound), DELAY * 2)
     }
-    
+
     endTurn = () => {
         console.debug('end turn')
         if(this.state.activeHandIndex > 0) {
-            this.startNextTurn()
+            setTimeout(() => this.startNextTurn(), DELAY)
         } else {
-            this.endRound()
+            setTimeout(() => this.endRound(), DELAY)
         }
     }
     
@@ -296,8 +299,8 @@ export default class Blackjack extends Component {
             this.hit(onlyOnce)
         }
         if(this.state.activeHandIndex === 0){            
-            this.revealDealerHand()
-            this.makeDealerDecision()
+            setTimeout(() => this.revealDealerHand(), DELAY)
+            setTimeout(() => this.makeDealerDecision(), DELAY)
         }
         console.log('start next turn', this.state)
     }
@@ -321,16 +324,24 @@ export default class Blackjack extends Component {
         this.startNewGame()
     }
 
+    render = ({}, {hands, bank, pot}) => {
+        const getTotal = (hand) => {
+            if (hand.cards.length < 2) return
+            if (hand.cards.find(card => card.isFaceDown)) return
+            return B.score(hand.cards)
+        }
 
-    render = ({}, {hands, bank}) => {
         return hands && (    
             <div class='blackjack'>
                 <h1>Blackjack</h1>
                 <div class='game-area'>
-                    <Gamehand hand={hands[0]} />
-                    <p>{bank}</p>
-                    <Gamehand hand={hands[1]} />
-                    {hands[2] && <Gamehand hand={hands[2]} />}
+                    <Gamehand hand={hands[0]} total={getTotal(hands[0])} />
+                    <div class='info'>
+                        <p>{`Stack: ${bank}`}</p>
+                        <p>{`Pot: ${pot*2}`}</p>
+                    </div>
+                    <Gamehand hand={hands[1]} total={getTotal(hands[1])} />
+                    {hands[2] &&  <Gamehand hand={hands[2]} total={getTotal(hands[2])} />}
                 </div>
                 <div>
                     <button onClick={this.handleAction}>Double Down</button>

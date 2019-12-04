@@ -33,6 +33,7 @@ html, body {
 }
 
 .game-hand {
+	position: relative;
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;
@@ -45,6 +46,10 @@ img.card {
 	padding: 0;
 	border: 0;
 	box-shadow: 2px 2px 10px 2px rgba(0,0,0,0.35);
+}
+
+.score {
+	font-size: 1.5em;
 }
 
 /*
