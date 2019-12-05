@@ -31,13 +31,31 @@ export default class Blackjack extends Component {
         shoe: null,
         hands: null,
         activeHandIndex: null,
-        isDealing: false
+        isDealing: false,
+        isSplit: false,
+        canSplit: false,
+        canDoubleDown: false
     }
 
     setStateSync = (stateUpdate) => {
         return new Promise(resolve => {
             this.setState(stateUpdate, resolve())
         })
+    }
+
+    get canSplit () {
+        if(this.state.bank < this.state.settings.minimumBet) return false
+        if(!this.state.hands.length || !this.state.activeHandIndex) return false
+        if(this.state.hands.length > 2) return false
+        const cards = this.state.hands[this.state.activeHandIndex].cards
+        return cards.length === 2 && cards[0].value === cards[1].value 
+    }
+
+    get canDoubleDown () {
+        if (this.state.bank < this.state.settings.minimumBet) return false
+        if (!this.state.hands.length || !this.state.activeHandIndex) return false
+        const cards = this.state.hands[this.state.activeHandIndex].cards
+        return cards.length === 2
     }
 
     resetShoe = () => {
@@ -159,7 +177,7 @@ export default class Blackjack extends Component {
         hands[2] = clone(BASE_HAND)
         hands[2].cards.push(hands[1].cards.pop())
         hands[2].bets[0] = this.bet()
-        this.setState({hands, activeHandIndex: null}, this.startNextTurn)
+        this.setState({hands, activeHandIndex: null, isSplit: true}, this.startNextTurn)
     }
 
     doubleDown = () => {
@@ -316,7 +334,7 @@ export default class Blackjack extends Component {
     resetRound = async () => {
         console.debug('resetRound')
         await this.reshuffleIfNeeded()
-        this.setState({hands: [clone(BASE_HAND), clone(BASE_HAND)]}, this.startNewGame)
+        this.setState({hands: [clone(BASE_HAND), clone(BASE_HAND)], isSplit: false}, this.startNewGame)
     }
 
     componentDidMount = async () => {
@@ -335,17 +353,21 @@ export default class Blackjack extends Component {
             <div class='blackjack'>
                 <h1>Blackjack</h1>
                 <div class='game-area'>
-                    <Gamehand hand={hands[0]} total={getTotal(hands[0])} />
-                    <div class='info'>
-                        <p>{`Stack: ${bank}`}</p>
-                        <p>{`Pot: ${pot*2}`}</p>
-                    </div>
-                    <Gamehand hand={hands[1]} total={getTotal(hands[1])} />
-                    {hands[2] &&  <Gamehand hand={hands[2]} total={getTotal(hands[2])} />}
+                    <section class='dealer'>
+                        <Gamehand hand={hands[0]} total={getTotal(hands[0])} />
+                    </section>
+                    <section class={`player ${this.state.isSplit && 'isSplit'}`}>
+                        <Gamehand hand={hands[1]} total={getTotal(hands[1])} />
+                        {this.state.isSplit && <Gamehand hand={hands[2]} total={getTotal(hands[2])} />}
+                    </section>
+                </div>
+                <div class='info'>
+                    <p>{`Stack: ${bank}`}</p>
+                    <p>{`Bet: ${pot}`}</p>
                 </div>
                 <div>
-                    <button onClick={this.handleAction}>Double Down</button>
-                    <button onClick={this.handleAction}>Split</button>
+                    <button onClick={this.handleAction} disabled={!this.canDoubleDown}>Double Down</button>
+                    <button onClick={this.handleAction} disabled={!this.canSplit}>Split</button>
                     <button onClick={this.handleAction}>Hit</button>
                     <button onClick={this.handleAction}>Stand</button>
                 </div>
