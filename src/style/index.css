@@ -1,10 +1,20 @@
+@import url('https://fonts.googleapis.com/css?family=Muli:400,700&display=swap');
+
+:root {
+	--main-bg-color: #F5E4A1;
+	--primary-color: #3C4627;
+	--primary-color-light: #A9BB79;
+	--primary-color-dark: #31443B;
+	--secondary-color: #BF483C;
+}
+
 html, body {
 	height: 100%;
 	width: 100%;
 	padding: 0;
 	margin: 0;
-	background: #FAFAFA;
-	font-family: 'Helvetica Neue', arial, sans-serif;
+	background: var(--main-bg-color);
+	font-family: 'Muli', sans-serif;
 	font-weight: 400;
 	color: #444;
 	-webkit-font-smoothing: antialiased;
@@ -17,6 +27,8 @@ html, body {
 
 #app {
 	height: 100%;
+	max-width: 980px;
+	margin: 0 auto;
 }
 
 .blackjack {
@@ -27,76 +39,130 @@ html, body {
 
 .game-area{
 	display: grid;
-	height: 100%;
 	grid-template-rows: auto;
-	grid-gap: 10px; 
+	grid-gap: 10px;
+	background: var(--primary-color-dark);
+	border: 3px solid brown;
+	border-radius: 2em;
+	margin-bottom: 2em;
 }
 
 .dealer, .player {
 	display: flex;
-	flex-flow: row nowrap;
-}
-
-.dealer {
-	align-items: center;
-	justify-content: center;
-}
-
-.player {
-	align-items: flex-start;
-	justify-content: space-around;
-}
-
-.game-hand {
-	position: relative;
-	/* display: flex;
 	flex-flow: row wrap;
 	align-items: center;
-	justify-content: center; */
+	justify-content: center;
 	margin-top: 2em;
+	margin-bottom: 1em;
 }
+
+.player.isSplit {
+	justify-content: space-evenly;
+}
+
+.info {
+	color: #fff;
+	text-align: center;
+}
+
+/* .game-hand {
+	
+} */
 
 .cards {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(33.333%, 1fr));
-	grid-gap: 5px;
+	position: relative;
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: center;
+	width: 100%;
 }
 
-.isSplit > .game-hand {
+.cards.dimmed {
+	opacity: 0.3;
+	transform: scale(0.8);
+}
+
+/* .isSplit > .game-hand {
     display: flex;
     flex-flow: column;
     align-content: center;
-}
-
-.isSplit > .game-hand > .cards {
-	grid-template-columns: repeat(2, 100px);
-}
+} */
 
 img.card {
-	position: relative;
-	width: 100%;
+	flex: 0 1 auto;
+	width: 15vh;
+	min-width: 50px;
+	max-width: 150px;
 	height: auto;
-	padding: 0;
-	border: 0;
+	margin-top: 10px;
+	margin-right: 10px;
 	box-shadow: 2px 2px 10px 2px rgba(0,0,0,0.35);
 }
 
+img.card:last-child {
+	margin-right: 0px;
+}
 
 .score {
 	display: inline-block;
 	position: absolute;
-	top: -1rem;
+	top: -0.75rem;
 	right: -1rem;
-	width: 2rem;
-	height: 2rem;
-	font-size: 1rem;
+	width: 3rem;
+	height: 3rem;
+	font-size: 1.5rem;
 	font-weight: 600;
 	line-height: 2em;
-	background: rgb(184, 149, 149);
+	background: var(--primary-color-light);
 	border-radius: 50%;
 	text-align: center;
-	color: red;
+	color: var(--primary-color-dark);
+	z-index: 1000;
 }
+
+.controls {
+	display: flex;
+	width: 100%;
+	max-width: 748px;
+	margin: 0 auto;
+}
+
+.controls button {
+	display: inline-block;
+	color: #fff;
+	font-size: 0.85em;
+	text-transform: uppercase;
+	font-weight: 700;
+	width: 50%;
+	height: 56px;
+	padding: .25rem .4rem;
+	text-align: center;
+	text-decoration: none;
+	vertical-align: middle;
+	white-space: wrap;
+	border-radius: 1rem;
+	cursor: pointer;
+}
+
+.controls > button:not(:last-child) {
+	margin-right: 10px;
+}
+
+button.red {
+	background: var(--secondary-color);
+}
+
+button.green {
+	background: var(--primary-color-dark);;
+}
+
+button:disabled {
+	background: grey;
+	color: darkgrey;
+	opacity: 0.75;
+	cursor: none;
+}
+
 
 /*
 img.card {

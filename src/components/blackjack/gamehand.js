@@ -1,11 +1,11 @@
 import PlayingCard from './playingcard'
 
-const GameHand = ({hand, total}) => {
+const GameHand = ({hand, total, dim}) => {
 	return (<div class='game-hand'>
-		<div class='cards'>
+		<div class={`cards ${dim ? 'dimmed' : ''}`}>
         	{hand.cards.length && hand.cards.map(c => (<PlayingCard card={c} isFaceDown={c.isFaceDown} />) )}
+			{total && <span class='score'>{total}</span>}
 		</div>
-		{total && <span class='score'>{total}</span>}
 	</div>)
 }
 

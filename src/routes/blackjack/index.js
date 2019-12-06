@@ -219,7 +219,7 @@ export default class Blackjack extends Component {
         const hands = this.state.hands
         hands[1].bets = [...hands[1].bets, this.bet()]
 
-        this.setState({hands: hands}, this.dealRound)
+        this.setState({hands: hands, inactive: true}, this.dealRound)
     }
 
     revealDealerHand = async () => {
@@ -246,6 +246,7 @@ export default class Blackjack extends Component {
 
     startRound = async () => {
         console.log('Start Round')
+        this.setState({inactive: false})
         await this.checkForBustsAndBlackjacks()
         if(this.state.hands.find(hand => hand.result)){
             await this.revealDealerHand()
@@ -305,7 +306,7 @@ export default class Blackjack extends Component {
         if(this.state.activeHandIndex > 0) {
             setTimeout(() => this.startNextTurn(), DELAY)
         } else {
-            setTimeout(() => this.endRound(), DELAY)
+            this.setState({inactive: true}, this.endRound)
         }
     }
     
@@ -316,7 +317,8 @@ export default class Blackjack extends Component {
             let onlyOnce = activeHand.cards[0].value === 'A'
             this.hit(onlyOnce)
         }
-        if(this.state.activeHandIndex === 0){            
+        if(this.state.activeHandIndex === 0){   
+            this.setState({inactive: true})         
             setTimeout(() => this.revealDealerHand(), DELAY)
             setTimeout(() => this.makeDealerDecision(), DELAY)
         }
@@ -335,6 +337,13 @@ export default class Blackjack extends Component {
         console.debug('resetRound')
         await this.reshuffleIfNeeded()
         this.setState({hands: [clone(BASE_HAND), clone(BASE_HAND)], isSplit: false}, this.startNewGame)
+    }
+
+    connectBP = () => {
+        fetch('https://bottle.dev/api/user')
+            .then(res => res.json())
+            .then(console.log)
+            .catch(err => console.error(err))
     }
 
     componentDidMount = async () => {
@@ -357,19 +366,19 @@ export default class Blackjack extends Component {
                         <Gamehand hand={hands[0]} total={getTotal(hands[0])} />
                     </section>
                     <section class={`player ${this.state.isSplit && 'isSplit'}`}>
-                        <Gamehand hand={hands[1]} total={getTotal(hands[1])} />
-                        {this.state.isSplit && <Gamehand hand={hands[2]} total={getTotal(hands[2])} />}
+                        <Gamehand hand={hands[1]} total={getTotal(hands[1])} dim={this.state.isSplit && this.state.activeHandIndex !== 1} />
+                        {this.state.isSplit && <Gamehand hand={hands[2]} total={getTotal(hands[2])} dim={this.state.isSplit && this.state.activeHandIndex !== 2} />}
+                    </section>
+                    <section class='info'>
+                        <h3>{`Stack: ${bank}`}</h3>
+                        <h3>{`Bet: ${pot}`}</h3>
                     </section>
                 </div>
-                <div class='info'>
-                    <p>{`Stack: ${bank}`}</p>
-                    <p>{`Bet: ${pot}`}</p>
-                </div>
-                <div>
-                    <button onClick={this.handleAction} disabled={!this.canDoubleDown}>Double Down</button>
-                    <button onClick={this.handleAction} disabled={!this.canSplit}>Split</button>
-                    <button onClick={this.handleAction}>Hit</button>
-                    <button onClick={this.handleAction}>Stand</button>
+                <div class='controls'>
+                    <button onClick={this.handleAction} disabled={!this.canDoubleDown || this.state.inactive} class='green'>Double Down</button>
+                    <button onClick={this.handleAction} disabled={!this.canSplit || this.state.inactive} class='green'>Split</button>
+                    <button onClick={this.handleAction} disabled={this.state.inactive} class='red'>Hit</button>
+                    <button onClick={this.handleAction} disabled={this.state.inactive} class='green'>Stand</button>
                 </div>
             </div>  
         )

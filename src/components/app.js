@@ -23,8 +23,8 @@ export default class App extends Component {
 			<div id="app">
 				<Header />
 				<Router onChange={this.handleRoute}>
-					{/* <Home path="/" /> */}
-					<Blackjack path='/' balance={10000} bet={50} />
+					<Home path="/" />
+					<Blackjack path='/blackjack' balance={10000} bet={50} />
 					<Profile path="/profile/" user="me" />
 					<Profile path="/profile/:user" />
 				</Router>
