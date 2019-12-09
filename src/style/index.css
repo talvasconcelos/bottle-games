@@ -90,9 +90,9 @@ html, body {
 
 img.card {
 	flex: 0 1 auto;
-	width: 15vh;
+	width: 20vw;
 	min-width: 50px;
-	max-width: 150px;
+	max-width: 200px;
 	height: auto;
 	margin-top: 10px;
 	margin-right: 10px;
